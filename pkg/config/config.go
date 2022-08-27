@@ -5,7 +5,6 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/nikitakosatka/markdown-notes/pkg/repository"
 	"log"
-	"os"
 )
 
 type DBConfig struct {
@@ -27,8 +26,7 @@ func Connect(dbConfig *DBConfig) *pg.DB {
 	var db = pg.Connect(opts)
 
 	if db == nil {
-		log.Printf("Failed to connect")
-		os.Exit(100)
+		log.Fatal("Failed to connect DB")
 	}
 	log.Printf("Connected to db")
 
