@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/nikitakosatka/markdown-notes/pkg/repository"
@@ -12,19 +13,18 @@ import (
 func Create(c *gin.Context) {
 	var note repository.Note
 
-	c.BindJSON(&note)
+	_ = c.BindJSON(&note)
 
 	note.ID = uuid.New().String()
 	note.CreatedAt = time.Now()
 	note.UpdatedAt = time.Now()
 
-	err := repository.Create(&note)
-
-	if err != nil {
-		log.Printf("Error while inserting new todo into db, Reason: %v\n", err)
+	if creationErr := repository.Create(&note); creationErr != nil {
+		message := fmt.Sprintf("Error while creating new note into db. Reason: %v\n", creationErr)
+		log.Printf(message)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Something went wrong",
+			"message": message,
 		})
 		return
 	}
@@ -37,13 +37,13 @@ func Create(c *gin.Context) {
 
 func GetAll(c *gin.Context) {
 	var notes []repository.Note
-	err := repository.GetAll(&notes)
 
-	if err != nil {
-		log.Printf("Error while getting all notes, Reason: %v\n", err)
+	if getErr := repository.GetAll(&notes); getErr != nil {
+		message := fmt.Sprintf("Error while getting all notes, Reason: %v\n", getErr)
+		log.Printf(message)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Something went wrong",
+			"message": message,
 		})
 		return
 	}
@@ -77,7 +77,8 @@ func Read(c *gin.Context) {
 
 func Update(c *gin.Context) {
 	var note repository.Note
-	c.BindJSON(&note)
+	id := c.Param("id")
+	note.ID = id
 
 	if validationErr := c.ShouldBindJSON(&note); validationErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -92,7 +93,7 @@ func Update(c *gin.Context) {
 		log.Printf(message)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  500,
-			"message": "Something went wrong",
+			"message": message,
 		})
 		return
 	}
@@ -107,12 +108,12 @@ func Remove(c *gin.Context) {
 	id := c.Param("id")
 	note := &repository.Note{ID: id}
 
-	err := repository.Remove(note)
-	if err != nil {
-		log.Printf("Error while deleting a single note, Reason: %v\n", err)
+	if err := repository.Remove(note); err != nil {
+		message := fmt.Sprintf("Error while deleting a single note, Reason: %v\n", err)
+		log.Printf(message)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  http.StatusInternalServerError,
-			"message": "Something went wrong",
+			"message": message,
 		})
 		return
 	}

@@ -8,9 +8,9 @@ import (
 func IncludeRouter(r *gin.Engine) {
 	apiGroup := r.Group("/api")
 	{
-		apiGroup.POST("/", service.Create) //
-		apiGroup.GET("/", service.GetAll)  //
-		apiGroup.GET("/:id", service.Read) //
+		apiGroup.POST("/", service.Create)
+		apiGroup.GET("/", service.GetAll)
+		apiGroup.GET("/:id", service.Read)
 		apiGroup.PUT("/:id", service.Update)
 		apiGroup.DELETE("/:id", service.Remove)
 	}
