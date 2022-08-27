@@ -15,10 +15,10 @@ func InitiateDB(db *pg.DB) {
 
 type Note struct {
 	ID        string    `json:"id" pg:",pk"`
-	Title     string    `json:"title"`
-	Body      string    `json:"body"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Title     string    `json:"title" binding:"required"`
+	Body      string    `json:"body" binding:"required"`
+	CreatedAt time.Time `json:"created_at" binding:"required"`
+	UpdatedAt time.Time `json:"updated_at" binding:"required"`
 }
 
 func CreateNoteTable(db *pg.DB) error {

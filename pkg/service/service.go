@@ -79,9 +79,17 @@ func Update(c *gin.Context) {
 	var note repository.Note
 	c.BindJSON(&note)
 
-	err := repository.Update(&note)
-	if err != nil {
-		log.Printf("Error, Reason: %v\n", err)
+	if validationErr := c.ShouldBindJSON(&note); validationErr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  400,
+			"message": "Not enough args in request",
+		})
+		return
+	}
+
+	if updateErr := repository.Update(&note); updateErr != nil {
+		message := fmt.Sprintf("Error. Reason: %v\n", updateErr)
+		log.Printf(message)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  500,
 			"message": "Something went wrong",
